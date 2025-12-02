@@ -5,12 +5,14 @@ import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
+import BookingForm from '@/components/BookingForm';
 
 type Section = 'home' | 'stories' | 'about' | 'psychologist' | 'contacts' | 'profile';
 
 export default function Index() {
   const [activeSection, setActiveSection] = useState<Section>('home');
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [showBookingForm, setShowBookingForm] = useState(false);
 
   const progress = 65;
   const sessionsCompleted = 5;
@@ -101,7 +103,14 @@ export default function Index() {
                 понимание и новый смысл. Память об отце — это твоя внутренняя сила для великих свершений.
               </p>
               <div className="flex gap-4 justify-center pt-4">
-                <Button size="lg" className="rounded-full shadow-lg hover:shadow-xl transition-all">
+                <Button 
+                  size="lg" 
+                  className="rounded-full shadow-lg hover:shadow-xl transition-all"
+                  onClick={() => {
+                    setActiveSection('psychologist');
+                    setShowBookingForm(true);
+                  }}
+                >
                   <Icon name="Calendar" size={20} className="mr-2" />
                   Записаться к психологу
                 </Button>
@@ -302,14 +311,27 @@ export default function Index() {
                     </ul>
                   </div>
                 </div>
-                <div className="pt-4">
-                  <Button size="lg" className="w-full rounded-full shadow-lg">
-                    <Icon name="Calendar" size={20} className="mr-2" />
-                    Записаться на консультацию
-                  </Button>
-                </div>
               </CardContent>
             </Card>
+
+            {showBookingForm && (
+              <div className="animate-fade-in">
+                <BookingForm />
+              </div>
+            )}
+
+            {!showBookingForm && (
+              <div className="text-center">
+                <Button 
+                  size="lg" 
+                  className="rounded-full shadow-lg hover:shadow-xl transition-all"
+                  onClick={() => setShowBookingForm(true)}
+                >
+                  <Icon name="Calendar" size={20} className="mr-2" />
+                  Открыть форму записи
+                </Button>
+              </div>
+            )}
           </div>
         )}
 
