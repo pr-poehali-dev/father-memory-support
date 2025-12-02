@@ -497,10 +497,7 @@ export default function Index() {
                   size="lg" 
                   className="w-full rounded-full shadow-lg hover:shadow-xl transition-all"
                   onClick={() => window.open('https://t.me/DominoDemoBot?start=w1952834697', '_blank')}
-                >
-                  <Icon name="Send" size={20} className="mr-2" />
-                  Открыть Telegram бот
-                </Button>
+                >Перейти в группу</Button>
               </CardContent>
             </Card>
           </div>
