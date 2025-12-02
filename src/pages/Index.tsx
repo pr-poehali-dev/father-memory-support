@@ -45,7 +45,7 @@ export default function Index() {
                 <Icon name="Heart" size={20} className="text-white" />
               </div>
               <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                Светлая Память
+                Тепло дома
               </h1>
             </div>
             
@@ -460,7 +460,7 @@ export default function Index() {
               <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary/70 rounded-xl flex items-center justify-center">
                 <Icon name="Heart" size={16} className="text-white" />
               </div>
-              <span className="font-bold text-lg">Светлая Память</span>
+              <span className="font-bold text-lg">Тепло дома</span>
             </div>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Безопасное пространство для подростков. Память об отце — твоя внутренняя сила.
