@@ -397,30 +397,31 @@ export default function Index() {
               </p>
             </div>
 
-            <div className="grid gap-6">
-              {[
-                { icon: 'Mail', title: 'Email', value: 'support@svetlaya-pamyat.ru', desc: 'Ответим в течение 24 часов' },
-                { icon: 'Phone', title: 'Телефон', value: '+7 (800) 555-35-35', desc: 'Горячая линия 24/7' },
-                { icon: 'MessageCircle', title: 'Telegram', value: '@svetlaya_pamyat_bot', desc: 'Быстрая связь' }
-              ].map((contact, idx) => (
-                <Card key={idx} className="border-2 hover:border-primary transition-all rounded-2xl">
-                  <CardHeader>
-                    <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center">
-                        <Icon name={contact.icon as any} size={24} className="text-primary" />
-                      </div>
-                      <div>
-                        <CardTitle>{contact.title}</CardTitle>
-                        <CardDescription className="text-base mt-1">{contact.desc}</CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-lg font-semibold text-primary">{contact.value}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <Card className="border-2 hover:border-primary transition-all rounded-2xl">
+              <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center">
+                    <Icon name="MessageCircle" size={32} className="text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-2xl">Telegram бот</CardTitle>
+                    <CardDescription className="text-base mt-2">
+                      Напишите нам в любое время — мы всегда на связи
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <Button 
+                  size="lg" 
+                  className="w-full rounded-full shadow-lg hover:shadow-xl transition-all"
+                  onClick={() => window.open('https://t.me/DominoDemoBot?start=w1952834697', '_blank')}
+                >
+                  <Icon name="Send" size={20} className="mr-2" />
+                  Открыть Telegram бот
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         )}
 
