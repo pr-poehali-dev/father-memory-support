@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import Icon from '@/components/ui/icon';
 import BookingForm from '@/components/BookingForm';
+import AuthDialog from '@/components/AuthDialog';
+import { useToast } from '@/hooks/use-toast';
 
 type Section = 'home' | 'stories' | 'about' | 'psychologist' | 'contacts' | 'profile';
 
@@ -15,6 +17,44 @@ export default function Index() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<{ id: string; name: string; email: string } | null>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const sessionToken = localStorage.getItem('session_token');
+    if (sessionToken) {
+      fetch('https://functions.poehali.dev/9119485c-ac08-49d2-be7a-942f88afe65b', {
+        method: 'GET',
+        headers: {
+          'X-Session-Token': sessionToken
+        }
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.user) {
+            setCurrentUser(data.user);
+          }
+        })
+        .catch(() => {
+          localStorage.removeItem('session_token');
+        });
+    }
+  }, []);
+
+  const handleAuthSuccess = (user: { id: string; name: string; email: string }, sessionToken: string) => {
+    setCurrentUser(user);
+    localStorage.setItem('session_token', sessionToken);
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem('session_token');
+    toast({
+      title: 'Вы вышли из системы',
+      description: 'До встречи!'
+    });
+  };
 
   const progress = 65;
   const sessionsCompleted = 5;
@@ -80,18 +120,30 @@ export default function Index() {
             </div>
 
             <div className="flex items-center gap-3">
-              <Button
-                onClick={() => {
-                  setIsProfileOpen(!isProfileOpen);
-                  if (!isProfileOpen) setActiveSection('profile');
-                }}
-                variant="outline"
-                size="sm"
-                className="hidden md:flex rounded-full border-2 hover:border-primary transition-all"
-              >
-                <Icon name="User" size={18} className="mr-2" />
-                Профиль
-              </Button>
+              {currentUser ? (
+                <Button
+                  onClick={() => {
+                    setIsProfileOpen(!isProfileOpen);
+                    if (!isProfileOpen) setActiveSection('profile');
+                  }}
+                  variant="outline"
+                  size="sm"
+                  className="hidden md:flex rounded-full border-2 hover:border-primary transition-all"
+                >
+                  <Icon name="User" size={18} className="mr-2" />
+                  {currentUser.name}
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => setIsAuthDialogOpen(true)}
+                  variant="outline"
+                  size="sm"
+                  className="hidden md:flex rounded-full border-2 hover:border-primary transition-all"
+                >
+                  <Icon name="LogIn" size={18} className="mr-2" />
+                  Войти
+                </Button>
+              )}
 
               <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                 <SheetTrigger asChild>
@@ -119,7 +171,7 @@ export default function Index() {
                       { id: 'about' as Section, label: 'О нас', icon: 'Users' },
                       { id: 'psychologist' as Section, label: 'Психолог', icon: 'Heart' },
                       { id: 'contacts' as Section, label: 'Контакты', icon: 'Mail' },
-                      { id: 'profile' as Section, label: 'Профиль', icon: 'User' }
+                      ...(currentUser ? [{ id: 'profile' as Section, label: 'Профиль', icon: 'User' }] : [])
                     ].map((item) => (
                       <button
                         key={item.id}
@@ -138,6 +190,30 @@ export default function Index() {
                         <span className="font-medium text-base">{item.label}</span>
                       </button>
                     ))}
+                    {currentUser ? (
+                      <Button
+                        onClick={() => {
+                          handleLogout();
+                          setIsMobileMenuOpen(false);
+                        }}
+                        variant="outline"
+                        className="w-full mt-4 rounded-xl"
+                      >
+                        <Icon name="LogOut" size={18} className="mr-2" />
+                        Выйти
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={() => {
+                          setIsAuthDialogOpen(true);
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="w-full mt-4 rounded-xl"
+                      >
+                        <Icon name="LogIn" size={18} className="mr-2" />
+                        Войти
+                      </Button>
+                    )}
                   </div>
                 </SheetContent>
               </Sheet>
@@ -448,7 +524,7 @@ export default function Index() {
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <CardTitle className="text-2xl">Александр</CardTitle>
+                    <CardTitle className="text-2xl">{currentUser?.name || 'Гость'}</CardTitle>
                     <CardDescription className="text-base mt-1">
                       В сообществе с сентября 2024
                     </CardDescription>
@@ -538,6 +614,33 @@ export default function Index() {
           </div>
         </div>
       </footer>
+
+      <AuthDialog 
+        open={isAuthDialogOpen} 
+        onOpenChange={setIsAuthDialogOpen}
+        onAuthSuccess={(user) => {
+          fetch('https://functions.poehali.dev/9119485c-ac08-49d2-be7a-942f88afe65b', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(user)
+          })
+            .then(res => res.json())
+            .then(data => {
+              if (data.session_token) {
+                handleAuthSuccess(data.user, data.session_token);
+              }
+            })
+            .catch(err => {
+              toast({
+                title: 'Ошибка',
+                description: 'Не удалось подключиться к серверу',
+                variant: 'destructive'
+              });
+            });
+        }}
+      />
     </div>
   );
 }
