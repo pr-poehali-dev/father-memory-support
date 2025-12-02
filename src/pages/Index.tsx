@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import Icon from '@/components/ui/icon';
 import BookingForm from '@/components/BookingForm';
 
@@ -13,6 +14,7 @@ export default function Index() {
   const [activeSection, setActiveSection] = useState<Section>('home');
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [showBookingForm, setShowBookingForm] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const progress = 65;
   const sessionsCompleted = 5;
@@ -72,18 +74,69 @@ export default function Index() {
               ))}
             </div>
 
-            <Button
-              onClick={() => {
-                setIsProfileOpen(!isProfileOpen);
-                if (!isProfileOpen) setActiveSection('profile');
-              }}
-              variant="outline"
-              size="sm"
-              className="rounded-full border-2 hover:border-primary transition-all"
-            >
-              <Icon name="User" size={18} className="mr-2" />
-              Профиль
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button
+                onClick={() => {
+                  setIsProfileOpen(!isProfileOpen);
+                  if (!isProfileOpen) setActiveSection('profile');
+                }}
+                variant="outline"
+                size="sm"
+                className="hidden md:flex rounded-full border-2 hover:border-primary transition-all"
+              >
+                <Icon name="User" size={18} className="mr-2" />
+                Профиль
+              </Button>
+
+              <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="md:hidden rounded-xl border-2"
+                  >
+                    <Icon name="Menu" size={20} />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                  <SheetHeader>
+                    <SheetTitle className="flex items-center gap-2">
+                      <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary/70 rounded-xl flex items-center justify-center">
+                        <Icon name="Heart" size={16} className="text-white" />
+                      </div>
+                      Тепло дома
+                    </SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-8 space-y-2">
+                    {[
+                      { id: 'home' as Section, label: 'Главная', icon: 'Home' },
+                      { id: 'stories' as Section, label: 'Истории', icon: 'BookOpen' },
+                      { id: 'about' as Section, label: 'О нас', icon: 'Users' },
+                      { id: 'psychologist' as Section, label: 'Психолог', icon: 'Heart' },
+                      { id: 'contacts' as Section, label: 'Контакты', icon: 'Mail' },
+                      { id: 'profile' as Section, label: 'Профиль', icon: 'User' }
+                    ].map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          setActiveSection(item.id);
+                          setIsMobileMenuOpen(false);
+                          if (item.id === 'profile') setIsProfileOpen(true);
+                        }}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                          activeSection === item.id
+                            ? 'bg-primary text-white shadow-md'
+                            : 'text-foreground/70 hover:text-foreground hover:bg-muted'
+                        }`}
+                      >
+                        <Icon name={item.icon as any} size={20} />
+                        <span className="font-medium text-base">{item.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
           </div>
         </div>
       </nav>
